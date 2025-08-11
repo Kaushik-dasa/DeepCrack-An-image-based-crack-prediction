@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User Login - DeepCrack Detection</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @keyframes floatingBackground {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+        @keyframes crackSpread {
+            0% { width: 0; height: 0; opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { width: 300px; height: 4px; opacity: 0.95; transform: scale(1.4) rotate(15deg); }
+            100% { width: 0; height: 0; opacity: 0; transform: scale(1) rotate(-15deg); }
+        }
+
+        @keyframes shardBurst {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) rotate(${Math.random() * 360}deg); opacity: 0; }
+        }
+
+        @keyframes crackFade {
+            0% { opacity: 1; transform: scale(1) rotate(0deg); }
+            100% { opacity: 0; transform: scale(1.6) rotate(30deg); }
+        }
+
+        @keyframes glowPulse {
+            0% { text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 0, 255, 0.3); }
+            50% { text-shadow: 0 0 25px rgba(0, 255, 0, 1), 0 0 35px rgba(255, 0, 0, 0.7), 0 0 45px rgba(0, 0, 255, 0.5); }
+            100% { text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(255, 0, 0, 0.5), 0 0 30px rgba(0, 0, 255, 0.3); }
+        }
+
+        @keyframes wave {
+            0% { transform: translateY(0) skew(0deg); }
+            50% { transform: translateY(-30px) skew(4deg); }
+            100% { transform: translateY(0) skew(0deg); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -300% 0; }
+            100% { background-position: 300% 0; }
+        }
+
+        @keyframes orbit {
+            0% { transform: rotate(0deg) translateX(25px) rotate(0deg); }
+            100% { transform: rotate(360deg) translateX(25px) rotate(-360deg); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #1a1a1a, #2b3a4d, #4a1e2e, #2e2e4d, #1a1a1a);
+            background-size: 400% 400%;
+            animation: floatingBackground 10s infinite alternate;
+            margin: 0;
+            padding: 0;
+            color: #d0d0ff;
+            overflow-y: auto;
+            /* Allow vertical scrolling */
+            min-height: 100vh;
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(0, 255, 0, 0.25), rgba(255, 0, 0, 0.15), rgba(0, 0, 255, 0.1), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            background: linear-gradient(90deg, rgba(20, 20, 20, 0.95), rgba(40, 60, 80, 0.9), rgba(80, 20, 40, 0.85), rgba(20, 40, 80, 0.8));
+            padding: 30px;
+            font-size: 24px;
+            text-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.9);
+            position: relative;
+            z-index: 10;
+            border-bottom: 4px solid rgba(0, 0, 255, 0.4);
+        }
+
+        header h1 {
+            margin: 0;
+            animation: glowPulse 2s infinite alternate;
+            position: relative;
+        }
+
+        header h1::before, header h1::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            top: 50%;
+            animation: orbit 5s linear infinite;
+        }
+
+        header h1::before {
+            background: #ff0000;
+            left: -30px;
+        }
+
+        header h1::after {
+            background: #00ff00;
+            right: -30px;
+            animation-direction: reverse;
+        }
+
+        nav {
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px 30px;
+            background: linear-gradient(90deg, rgba(20, 20, 20, 0.9), rgba(40, 60, 80, 0.85), rgba(80, 20, 40, 0.8), rgba(20, 40, 80, 0.75));
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            z-index: 10;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .button-container button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #2b3a4d, #00ff00, #ff0000, #0000ff);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 255, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .button-container button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+            z-index: -1;
+        }
+
+        .button-container button:hover {
+            background: linear-gradient(45deg, #00ff00, #66ff66, #ff6666, #6666ff);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.7);
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            position: relative;
+            z-index: 1;
+        }
+
+        main h2 {
+            font-size: 36px;
+            text-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+            animation: wave 5.5s infinite;
+            background: linear-gradient(90deg, #00ff00, #ff0000, #0000ff, #66ff66);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+            width: 300px;
+            animation: glowBox 3s infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glowBox {
+            0% { box-shadow: 0 4px 8px rgba(0, 0, 255, 0.6); }
+            50% { box-shadow: 0 8px 16px rgba(255, 0, 0, 0.8); }
+            100% { box-shadow: 0 4px 8px rgba(0, 255, 0, 0.7); }
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .login-container input {
+            padding: 8px;
+            width: 90%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            background: rgba(20, 20, 20, 0.8);
+            color: #d0d0ff;
+        }
+
+        .login-container button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(45deg, #2b3a4d, #00ff00, #ff0000, #0000ff);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 255, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+            animation: shimmer 3s infinite;
+            z-index: -1;
+        }
+
+        .login-container button:hover {
+            background: linear-gradient(45deg, #00ff00, #66ff66, #ff6666, #6666ff);
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(255, 0, 0, 0.7);
+        }
+
+        .register-link a {
+            color: #00ccff;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            color: #ff6666;
+        }
+
+        .crack-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, #00ff00, #ff0000, #0000ff, transparent);
+            pointer-events: none;
+            z-index: 5;
+            animation: crackSpread 1s ease-out forwards;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.7);
+        }
+
+        .crack-shard {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, #ff0000, transparent);
+            pointer-events: none;
+            z-index: 5;
+            animation: shardBurst 1.5s ease-out forwards;
+            border-radius: 50%;
+        }
+
+        .crack-effect {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            background: url('./static/2.webp') no-repeat;
+            background-size: contain;
+            pointer-events: none;
+            animation: crackFade 2.2s forwards;
+            z-index: 2;
+            filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.8));
+        }
+
+        .ripple-effect {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 0, 255, 0.5);
+            pointer-events: none;
+            z-index: 4;
+            animation: ripple 1.2s ease-out forwards;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp 9s ease forwards;
+            z-index: 0;
+            background: radial-gradient(circle, rgba(0, 255, 0, 0.8), transparent);
+        }
+
+        .orbit-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0000ff;
+            border-radius: 50%;
+            animation: orbit 4s linear infinite;
+        }
+
+        footer {
+            background: linear-gradient(90deg, rgba(20, 20, 20, 0.95), rgba(40, 60, 80, 0.9), rgba(80, 20, 40, 0.85), rgba(20, 40, 80, 0.8));
+            padding: 15px;
+            font-size: 14px;
+            text-shadow: 0 0 12px rgba(0, 0, 255, 0.6);
+            box-shadow: 0 -10px 35px rgba(0, 0, 0, 0.9);
+            z-index: 10;
+            border-top: 4px solid rgba(0, 255, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay"></div>
+    <header>
+        <h1>DeepCrack Detection</h1>
+    </header>
+    
+    <nav>
+        <div class="button-container">
+            <button onclick="window.location.href='/'">Home</button>
+            <button onclick="window.location.href='/user_login'">User Login</button>
+            <button onclick="window.location.href='/user_register'">User Register</button>
+            <button onclick="window.location.href='/admin_login'">Admin Login</button>
+        </div>
+    </nav>
+
+    <main style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 60vh; text-align: center;">
+        <h2>Welcome Admin!</h2>
+        
+        <div class="login-container" style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6); width: 300px;">
+            <p>Log in to manage and oversee the Deep Crack Prediction system with advanced control features.</p>
+            
+            <form method="POST" action="/admin_login" style="display: flex; flex-direction: column; align-items: center;">
+                <div class="form-group" style="width: 100%; margin-top: 10px;">
+                    <label for="username" style="margin-bottom: 5px;">Admin Username:</label>
+                    <input type="text" id="username" name="username" required style="padding: 8px; width: 90%; border-radius: 5px; border: 1px solid #ccc;">
+                </div>
+                
+                <div class="form-group" style="width: 100%; margin-top: 10px;">
+                    <label for="password" style="margin-bottom: 5px;">Password:</label>
+                    <input type="password" id="password" name="password" required style="padding: 8px; width: 90%; border-radius: 5px; border: 1px solid #ccc;">
+                </div>
+                
+                <button type="submit" style="margin-top: 15px; padding: 10px 20px; border: none; border-radius: 5px; background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff); color: white; font-size: 16px; cursor: pointer; transition: 0.3s; width: 90%;">
+                    Login
+                </button>
+            </form>
+        </div>
+    </main>
+    
+    
+    <footer>
+        <p>© 2025 DeepCrack Detector. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Crack effect on cursor movement with shards and ripples
+        let lastCrackTime = 0;
+        const colors = ['#00ff00', '#ff0000', '#0000ff', '#1a1a1a']; // Green, Red, Blue, Black
+        document.addEventListener("mousemove", (e) => {
+            const now = Date.now();
+            if (now - lastCrackTime > 100) { // Throttle to every 100ms
+                // Crack line
+                const crackLine = document.createElement("div");
+                crackLine.classList.add("crack-line");
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                crackLine.style.background = `linear-gradient(90deg, transparent, ${randomColor}, ${colors[(colors.indexOf(randomColor) + 1) % colors.length]}, transparent)`;
+                crackLine.style.left = `${e.clientX - 150}px`;
+                crackLine.style.top = `${e.clientY}px`;
+                crackLine.style.transform = `rotate(${Math.random() * 360}deg)`;
+                crackLine.style.boxShadow = `0 0 20px ${randomColor}`;
+                document.body.appendChild(crackLine);
+                setTimeout(() => crackLine.remove(), 1000);
+
+                // Crack shards
+                for (let i = 0; i < 3; i++) {
+                    const shard = document.createElement("div");
+                    shard.classList.add("crack-shard");
+                    shard.style.left = `${e.clientX}px`;
+                    shard.style.top = `${e.clientY}px`;
+                    shard.style.background = `radial-gradient(circle, ${colors[i % colors.length]}, transparent)`;
+                    document.body.appendChild(shard);
+                    setTimeout(() => shard.remove(), 1500);
+                }
+
+                // Ripple effect
+                const ripple = document.createElement("div");
+                ripple.classList.add("ripple-effect");
+                ripple.style.left = `${e.clientX - 50}px`;
+                ripple.style.top = `${e.clientY - 50}px`;
+                document.body.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 1200);
+
+                // Crack image (if available)
+              
+            }
+        });
+
+        // Dynamic particle system with varied colors
+        function createParticle(x, y, sizeMultiplier = 1, color = null) {
+            const particle = document.createElement("div");
+            particle.classList.add("particle");
+            const size = (Math.random() * 15 + 8) * sizeMultiplier;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            const particleColor = color || colors[Math.floor(Math.random() * colors.length)];
+            particle.style.background = `radial-gradient(circle, ${particleColor}, transparent)`;
+            particle.style.left = `${x || Math.random() * 100}vw`;
+            particle.style.top = `${y || Math.random() * 100}vh`;
+            document.body.appendChild(particle);
+            setTimeout(() => particle.remove(), 9000);
+        }
+        setInterval(() => createParticle(), 200);
+
+        // Particles on crack effect
+        document.addEventListener("mousemove", (e) => {
+            if (Math.random() > 0.5) {
+                createParticle(e.clientX / window.innerWidth * 100, e.clientY / window.innerHeight * 100, 0.8);
+            }
+        });
+
+        // Orbiting particles around header and footer
+        const header = document.querySelector("header");
+        const footer = document.querySelector("footer");
+        for (let i = 0; i < 4; i++) {
+            const orbitParticle = document.createElement("div");
+            orbitParticle.classList.add("orbit-particle");
+            orbitParticle.style.top = `${50 + Math.sin(i * 2) * 25}%`;
+            orbitParticle.style.left = `${-35 + Math.cos(i * 2) * 25}px`;
+            orbitParticle.style.background = colors[i % colors.length];
+            orbitParticle.style.animationDelay = `${i * 0.5}s`;
+            header.appendChild(orbitParticle.cloneNode(true));
+            footer.appendChild(orbitParticle);
+        }
+
+        // Button hover and click effects
+        const buttons = document.querySelectorAll(".button-container button, .login-container button");
+        buttons.forEach(button => {
+            button.addEventListener("mouseenter", () => {
+                button.style.transition = "all 0.3s ease";
+                button.style.transform = "translateY(-5px) scale(1.06)";
+            });
+            button.addEventListener("mouseleave", () => {
+                button.style.transform = "translateY(0) scale(1)";
+            });
+            button.addEventListener("click", () => {
+                button.style.transition = "transform 0.2s";
+                button.style.transform = "translateY(-8px)";
+                setTimeout(() => {
+                    button.style.transform = "translateY(0)";
+                }, 200);
+                const rect = button.getBoundingClientRect();
+                for (let i = 0; i < 10; i++) {
+                    createParticle(
+                        (rect.left + rect.width / 2) / window.innerWidth * 100,
+                        (rect.top + rect.height / 2) / window.innerHeight * 100,
+                        0.7,
+                        colors[i % colors.length]
+                    );
+                }
+            });
+        });
+
+        // Main text hover wave
+        const main = document.querySelector("main");
+        main.addEventListener("mouseenter", () => {
+            main.querySelector("h2").style.animation = "wave 2s infinite";
+        });
+        main.addEventListener("mouseleave", () => {
+            main.querySelector("h2").style.animation = "wave 5.5s infinite";
+        });
+
+        // Dynamic CSS for particle animation
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = `
+            @keyframes floatUp {
+                0% { transform: translateY(0) translateX(0); opacity: 1; }
+                100% { transform: translateY(-${Math.random() * 80 + 60}vh) translateX(${Math.random() * 50 - 25}vw); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    </script>
+</body>
+</html>
